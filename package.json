@@ -1,0 +1,14 @@
+{
+  "name": "gohar-website",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "node tools/build.mjs",
+    "films": "node tools/make-films.mjs",
+    "start": "npx --yes serve@14.2.4 -l 5173 ."
+  },
+  "devDependencies": {
+    "ffmpeg-static": "5.2.0"
+  }
+}
