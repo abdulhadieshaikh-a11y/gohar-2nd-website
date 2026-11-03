@@ -17,6 +17,46 @@ export const company = {
   purpose: 'To build safe, legally sound communities where trust is foundational and relationships always come first.',
   mission: 'To rebuild and sustain customer loyalty by prioritizing transparent communication, resolving past delivery delays, and proving every day that we believe in relationships.',
   promise: 'Where Relationships Come First. We build with clarity, serve with intent, and design every interaction around long-term trust.',
+  // Form backend. Leave empty: forms open WhatsApp / the visitor's email app with the message ready to send.
+  // Set to an HTTPS endpoint that accepts a JSON POST to send forms directly (see README).
+  formEndpoint: '',
+  // Gohar Assistant: optional AI endpoint. Leave empty: the assistant answers from this website's content.
+  // Set to an HTTPS endpoint that accepts { message, history, context } and returns { reply } to add AI answers (see README).
+  assistantEndpoint: 'api/assistant',
+};
+
+// Home hero media. No real footage was found on the source site, so 'video' is empty and the hero shows
+// a photographic motion piece made from official renders and photographs (tools/make-films.mjs).
+// To use real footage later: set video to e.g. 'assets/video/film/hero.mp4' (+ videoPoster) and rebuild.
+export const heroMedia = {
+  // DEMO FOOTAGE: free licensed stock clips from Pexels (pexels.com/license, commercial use allowed),
+  // NOT Gohar buildings. Hero clips (close-up dark glass, slow push-in): 9874596, 10191124, 37196426, 9701001,
+  // 18484700; band 4308110; footer 10227696. Replace with Gohar's own drone
+  // film before launch, or set video to '' to go back to the photographic preview.
+  video: 'assets/video/stock/hero.mp4', videoMobile: 'assets/video/stock/hero-mobile.mp4', videoPoster: 'assets/video/stock/hero.jpg', stock: true,
+  motion: 'assets/video/hero.mp4', poster: 'assets/video/hero.jpg',
+  // the motion piece is built from these frames, in order; the hero caption follows them
+  size: [1600, 900], clip: 4.6, fade: 1,
+  frames: [
+    ['gohar-gateway/exterior.webp', 'gohar-gateway'],
+    ['141-broadway-heights/dusk.jpg', '141-broadway-heights'],
+    ['gohar-golf-vista/golf-course.webp', 'gohar-golf-vista'],
+    ['gohar-residencia-shopping-mall/render-008.webp', 'gohar-residencia-shopping-mall'],
+    ['kn-gohar-green-city/view-2.jpg', 'kn-gohar-green-city'],
+  ],
+};
+
+// About page hero media (photographic motion, same rules as above)
+export const aboutMedia = {
+  video: '', videoPoster: '',
+  motion: 'assets/video/about.mp4', poster: 'assets/video/about.jpg',
+  size: [1600, 900], clip: 5, fade: 1,
+  frames: [
+    ['gohar-towers/exterior.jpg', 'gohar-towers'],
+    ['kn-gohar-green-city/view-1.jpg', 'kn-gohar-green-city'],
+    ['gohar-villas/gate.jpg', 'gohar-villas'],
+    ['gohar-golf-vista/towers-aerial.webp', 'gohar-golf-vista'],
+  ],
 };
 
 export const values = [
@@ -50,7 +90,8 @@ export const projects = [
     facts: [['Towers', '1'], ['Floors', 'Basement, LG, UG, 3 parking levels, 8 residential floors and roof'], ['Residences', '3 & 4-room apartments'], ['Commercial', 'Commercial outlets and office spaces'], ['Pricing', 'On request']],
     keyStats: [['Towers', '1'], ['Residential floors', '8'], ['Apartments', '3 & 4-room']],
     amenities: ['Infinity pool with rooftop deck', 'Rooftop garden', 'Commercial-sized gym', 'Co-working space'],
-    hero: 'dusk.jpg', card: 'exterior.jpg',
+    hero: 'dusk.jpg', card: 'exterior.jpg', look: 'cinema', tone: '#151a24',
+    media: { video: '', videoPoster: '', motion: 'assets/video/141-broadway-heights.mp4', poster: 'assets/video/141-broadway-heights.jpg' },
     gallery: ['exterior.jpg', 'rooftop-pool.jpg', 'terrace.jpg', 'living.jpg', 'bedroom.jpg', 'dusk.jpg'],
     plans: [['plan-basement.jpg', 'Basement'], ['plan-typical-residential.jpg', 'Typical residential floor'], ['plan-roof.jpg', 'Roof']],
     address: 'Plot #141, 17th Street East, Main Korangi Road, beside Toyota Defence Motors, DHA Phase 1, Karachi',
@@ -72,7 +113,8 @@ export const projects = [
     keyStats: [['Apartment types', '9'], ['Rooms', '2 – 4'], ['City', 'Hyderabad']],
     layouts: [['4 rooms', 'Type A and Type A1'], ['3 rooms', 'Type B, B1, B2 and B3'], ['2 rooms', 'Type C, C1 and C2']],
     amenities: ['Banquet', 'Restaurant', 'Entertainment area', 'Commercial outlets'],
-    hero: 'exterior.webp', card: 'exterior.webp',
+    hero: 'exterior.webp', card: 'hotel-tower.jpg', look: 'cinema', tone: '#241d16',
+    media: { video: '', videoPoster: '', motion: 'assets/video/gohar-gateway.mp4', poster: 'assets/video/gohar-gateway.jpg' },
     gallery: ['exterior.webp', 'aerial-courtyard.webp', 'hotel-tower.jpg', 'courtyard.jpg'],
     payment: {
       terms: '10% each on booking, confirmation, allocation and start of work + 48 monthly instalments + 8 half-yearly instalments + 10% before possession',
@@ -103,7 +145,8 @@ export const projects = [
     ],
     facts: [['Floors', 'Basement parking, ground-floor parking and 13 floors'], ['Residences', '3, 4 and 5-bedroom apartments'], ['Setting', 'Next to ACACIA Golf Club'], ['Structure', 'Earthquake-resilient (as stated by the developer)'], ['Home financing', 'Islamic home financing with Meezan Bank (partnership announced July 2026)'], ['Pricing', 'On request']],
     keyStats: [['Floors', '13'], ['Bedrooms', '3 – 5'], ['Setting', 'Golf course']],
-    hero: 'golf-course.webp', card: 'exterior.webp',
+    hero: 'golf-course.webp', card: 'exterior.webp', look: 'cinema', tone: '#17221b',
+    media: { video: '', videoPoster: '', motion: 'assets/video/gohar-golf-vista.mp4', poster: 'assets/video/gohar-golf-vista.jpg' },
     gallery: ['exterior.webp', 'golf-course.webp', 'towers-aerial.webp', 'facade-detail.webp', 'balconies.webp'],
     address: 'Near ACACIA Country & Golf Club, Gulshan-e-Roomi, Karachi',
     nearby: ['Adjacent to ACACIA Golf Club'],
@@ -122,7 +165,8 @@ export const projects = [
     facts: [['Towers', '4'], ['Floors', '14'], ['Apartments', '1,033'], ['Shops', '301'], ['Payment', 'Payment plan available']],
     keyStats: [['Towers', '4'], ['Apartments', '1,033'], ['Shops', '301']],
     layouts: [['Type A · 3 bed lounge', '1,200 sq ft gross (867 sq ft net) · Towers 1 & 2'], ['Type B · 2 bed lounge', '850 sq ft gross (543 sq ft net) · Towers 3 & 4'], ['Type C · 1 bed lounge', '550 sq ft gross (377 sq ft net) · Towers 3 & 4']],
-    hero: 'render-010.webp', card: 'render-010.webp',
+    hero: 'render-010.webp', card: 'street-view.jpg', look: 'cinema', tone: '#1b2024',
+    media: { video: '', videoPoster: '', motion: 'assets/video/gohar-residencia-shopping-mall.mp4', poster: 'assets/video/gohar-residencia-shopping-mall.jpg' },
     gallery: ['render-010.webp', 'street-view.jpg', 'render-008.webp', 'aerial.jpg', 'render-005.webp', 'render-001.webp'],
     payment: {
       terms: 'Prices vary by floor band.',
@@ -148,8 +192,10 @@ export const projects = [
     facts: [['Towers', '3'], ['Residences', '5 and 6-room apartments'], ['Status', 'Completed']],
     keyStats: [['Towers', '3'], ['Rooms', '5 – 6'], ['Status', 'Ready']],
     layouts: [['Executive', '6 rooms'], ['Prime', '5 rooms'], ['Premium', '5 rooms']],
-    hero: 'towers-sky.jpg', card: 'exterior.jpg',
-    gallery: ['towers-sky.jpg', 'exterior.jpg'],
+    hero: 'exterior.jpg', card: 'towers-sky.jpg', look: 'split', tone: '#1f1f1b',
+    // no photographic motion: only two source images, one of them low-resolution
+    media: { video: '', videoPoster: '', motion: '', poster: '' },
+    gallery: ['exterior.jpg', 'towers-sky.jpg'],
     payment: {
       terms: '50% on booking + 3 monthly instalments + balance before possession + documentation charges',
       rows: [
@@ -174,7 +220,9 @@ export const projects = [
     facts: [['Towers', '5'], ['Residences', '3, 4 and 5-room flats'], ['Commercial', 'Shops on the ground floor'], ['Home financing', 'Islamic home financing with Meezan Bank (partnership announced July 2026)']],
     keyStats: [['Towers', '5'], ['Rooms', '3 – 5'], ['Status', 'Ready']],
     layouts: [['Type A', '5 rooms'], ['Type B', '4 rooms'], ['Type B1', '3 rooms']],
-    hero: 'exterior.jpg', card: 'exterior.jpg',
+    hero: 'exterior.jpg', card: 'exterior.jpg', look: 'split', tone: '#231c19',
+    // only one official image exists, so no motion piece is made from it
+    media: { video: '', videoPoster: '', motion: '', poster: '' },
     gallery: ['exterior.jpg'],
     payment: {
       terms: 'Booking amount + 3 monthly instalments + balance before possession',
@@ -199,7 +247,8 @@ export const projects = [
     ],
     facts: [['Buildings', '1'], ['Floors', 'Ground + 5'], ['Floor plans', 'Basement parking, lower ground, upper ground and 1st–5th floors'], ['Shops', '411'], ['Pricing', 'On request']],
     keyStats: [['Shops', '411'], ['Floors', 'G + 5'], ['Buildings', '1']],
-    hero: 'exterior.jpg', card: 'exterior.jpg',
+    hero: 'exterior.jpg', card: 'brochure-exterior.jpg', look: 'split', tone: '#2a1714',
+    media: { video: '', videoPoster: '', motion: 'assets/video/gohar-green-corner-shopping-center.mp4', poster: 'assets/video/gohar-green-corner-shopping-center.jpg' },
     gallery: ['exterior.jpg', 'brochure-exterior.jpg', 'street-view.jpg'],
     plans: [['plan-basement.jpg', 'Basement'], ['plan-lower-ground.jpg', 'Lower ground'], ['plan-upper-ground.jpg', 'Upper ground'], ['plan-1st-4th.jpg', '1st & 4th floor'], ['plan-2nd-3rd-5th.jpg', '2nd, 3rd & 5th floor']],
     address: 'Korangi Link Road, behind Malir Court, Karachi',
@@ -218,7 +267,9 @@ export const projects = [
     ],
     facts: [['Buildings', '1'], ['Floors', 'Lower ground, upper ground and 1st to 7th floors'], ['Space types', 'Shops and offices'], ['Payment', '1-year payment plan, possession on 50% payment (as published)'], ['Pricing', 'On request']],
     keyStats: [['Floors', 'LG + UG + 7'], ['Spaces', 'Shops & offices'], ['Plan', '1 year']],
-    hero: 'day-view.jpg', card: 'day-view.jpg',
+    hero: 'day-view.jpg', card: 'day-view.jpg', look: 'split', tone: '#242019',
+    // only one official image exists, so no motion piece is made from it
+    media: { video: '', videoPoster: '', motion: '', poster: '' },
     gallery: ['day-view.jpg'],
     address: 'Plot No. 171/1-A, Block 3, PECHS, Karachi',
     nearby: ['Adjacent to Rabi Centre, Tariq Road', 'Tariq Road'],
@@ -236,7 +287,8 @@ export const projects = [
     facts: [['Phases', '3'], ['Plot sizes', '100, 120, 160 and 200 sq yd'], ['Plot types', 'Residential (all phases) and commercial (Phase 3)'], ['Payment', '36-month instalment plan (as published)']],
     keyStats: [['Phases', '3'], ['Plot sizes', '100 – 200 sq yd'], ['Plan', '36 months']],
     layouts: [['Phase 1', 'Residential plots of 120 and 160 sq yd'], ['Phase 2', 'Residential plots of 120 and 160 sq yd'], ['Phase 3', 'Residential plots of 120 sq yd; commercial plots of 100 and 200 sq yd']],
-    hero: 'gate.jpg', card: 'gate.jpg',
+    hero: 'gate.jpg', card: 'gate-approach.webp', look: 'frame', tone: '#1d2219',
+    media: { video: '', videoPoster: '', motion: 'assets/video/gohar-villas.mp4', poster: 'assets/video/gohar-villas.jpg' },
     gallery: ['gate.jpg', 'gate-approach.webp', 'park.jpg', 'community-centre.jpg', 'masjid.jpg', 'hospital.jpg', 'commercial-area.webp', 'masterplan.jpg'],
     plans: [['masterplan-phase-1.webp', 'Phase 1 masterplan'], ['masterplan-phase-2.webp', 'Phase 2 masterplan'], ['masterplan-phase-3.webp', 'Phase 3 masterplan']],
     payment: {
@@ -269,7 +321,8 @@ export const projects = [
     keyStats: [['Community', 'Gated'], ['Floors', 'B + G + 4'], ['Amenities', '6+']],
     layouts: [['Platinum', '120 sq yd, one unit'], ['Gold', '120 sq yd, single storey'], ['Silver', '80 sq yd, single storey'], ['Apartments', 'Types A, B, C and D']],
     amenities: ['Club house', 'Swimming pool', 'Mini golf', "Children's play area", 'Basketball court', 'Security control room'],
-    hero: 'photo-lawn.jpg', card: 'photo-lawn.jpg',
+    hero: 'view-3.jpg', card: 'photo-club-house.jpg', look: 'frame', tone: '#16211a',
+    media: { video: '', videoPoster: '', motion: 'assets/video/kn-gohar-green-city.mp4', poster: 'assets/video/kn-gohar-green-city.jpg' },
     gallery: ['photo-club-house.jpg', 'photo-lawn.jpg', 'photo-garden-walk.jpg', 'photo-street.jpg', 'photo-facade.jpg', 'view-1.jpg', 'view-2.jpg', 'view-3.jpg'],
     plans: [['master-layout-plan.jpg', 'Master layout plan']],
     address: 'Korangi Road Link, off Shahrah-e-Faisal, near the Malir Court area, Karachi',
@@ -278,32 +331,12 @@ export const projects = [
   },
 ];
 
-export const stories = [
-  {
-    slug: 'meezan-bank', tag: 'News & Updates', date: '18 July 2026', read: '1 min read', img: 'stories/meezan-bank-mou.jpg',
-    title: 'Making Home Ownership Accessible: Gohar Group Partners with Meezan Bank',
-    text: 'Gohar Group of Companies has announced a strategic partnership with Meezan Bank to provide Shariah-compliant home financing for selected residential projects, including Gohar Golf Vista and Gohar Complex & Shopping Mall.',
-  },
-  {
-    slug: 'green-hotel-reit', tag: 'News & Updates', date: '18 July 2026', read: '1 min read', img: 'stories/green-hotel-reit-signing.jpg',
-    title: 'A New Era for Hyderabad: Pakistan’s First Shariah-Compliant Green Hotel REIT',
-    text: 'The signing ceremony for Pakistan’s first Shariah-compliant green hotel REIT, anchored at Gohar Gateway with JS Investments, marks a landmark moment for Hyderabad and the country’s hospitality sector.',
-  },
-  {
-    slug: 'gateway-benchmark', tag: 'Buying', date: '16 June 2026', read: '1 min read', img: 'gohar-gateway/aerial-courtyard.webp',
-    title: 'Gohar Gateway: A New Benchmark for Luxury Living in Hyderabad',
-    text: 'In the bustling heart of Hyderabad, Gohar Gateway offers an elevated living experience on the main Hyderabad bypass road, opposite Hyderabad Darbar Hotel, with 2, 3 and 4-room apartments, retail, a banquet and dining.',
-  },
-  {
-    slug: 'buying-tips', tag: 'Buying', date: '16 June 2026', read: '2 min read', img: 'gohar-golf-vista/golf-course.webp',
-    title: '5 Essential Tips Before Buying Your Dream Property',
-    text: 'Buying your own home is one of the most significant decisions in life. Set a clear budget, check the legal standing of the project, visit the site in person, understand the payment plan in full, and choose a developer you can trust for the long term.',
-  },
-];
+// Gohar Stories articles live in tools/stories.mjs
+export { stories } from './stories.mjs';
 
 export const faqs = [
   ['How do I enquire about a project?', 'Use the enquiry form on any project page or on our contact page, call our UAN +92 21 111 000 061, or email info@gohargoc.com. Our team responds during office hours (Monday to Saturday, 11:00 AM – 8:00 PM).'],
-  ['Can I visit a project site?', 'Yes. Request a site visit, tell us the project and the days that suit you, and our team will call you to arrange the visit.'],
+  ['Can I visit a project site?', 'Yes. Schedule a site visit: tell us the project and the days that suit you, and our team will call you to confirm the visit.'],
   ['Are payment plans available?', 'Payment plans are published for Gohar Gateway, Gohar Towers, Gohar Complex & Shopping Mall, Gohar Residencia & Shopping Mall and Gohar Villas. Plans and terms change over time, so please ask our sales team for the current details.'],
   ['Why are some prices not shown?', 'Prices and availability change, and we want you to receive accurate figures. Request current pricing through the enquiry form or by phone and our team will share the latest details.'],
   ['I live overseas. Can I enquire?', 'Yes. Select “Overseas” as your city on the enquiry form and include an international phone number. Our team will contact you by phone or email.'],

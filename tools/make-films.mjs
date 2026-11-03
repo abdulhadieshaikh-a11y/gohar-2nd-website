@@ -1,31 +1,28 @@
-// Makes cinematic MP4 films from Gohar's own renders and photos.
-// Slow camera moves (push-in, pull-out, pans) with soft crossfades.
+// Makes "photographic motion" MP4s from Gohar's own renders and photos.
+// These are NOT footage: slow camera moves (push-in, pull-out, pans) over stills with soft crossfades.
+// The site labels them "Photographic preview". Real footage goes in data.mjs (media.video), never here.
 // Usage: node tools/make-films.mjs            -> all films
 //        node tools/make-films.mjs hero gohar-gateway  -> only these
 import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import ffmpeg from 'ffmpeg-static';
+import { heroMedia, aboutMedia } from './data.mjs';
 
 const IMG = 'assets/img';
 const OUT = 'assets/video';
 fs.mkdirSync(OUT, { recursive: true });
 
 const films = {
-  hero: { size: [1920, 1080], clip: 4.6, imgs: [
-    'gohar-gateway/exterior.webp', '141-broadway-heights/dusk.jpg', 'gohar-golf-vista/golf-course.webp',
-    'gohar-residencia-shopping-mall/render-010.webp', 'gohar-gateway/aerial-courtyard.webp',
-    '141-broadway-heights/rooftop-pool.jpg', 'kn-gohar-green-city/photo-lawn.jpg'] },
-  about: { size: [1600, 900], clip: 5, imgs: [
-    'gohar-towers/towers-sky.jpg', 'gohar-villas/gate.jpg', 'kn-gohar-green-city/photo-club-house.jpg', 'gohar-golf-vista/towers-aerial.webp'] },
+  // hero + about read their frames from data.mjs so the on-page caption stays in sync
+  hero: { size: heroMedia.size, clip: heroMedia.clip, imgs: heroMedia.frames.map(([f]) => f) },
+  about: { size: aboutMedia.size, clip: aboutMedia.clip, imgs: aboutMedia.frames.map(([f]) => f) },
   '141-broadway-heights': { imgs: ['141-broadway-heights/dusk.jpg', '141-broadway-heights/rooftop-pool.jpg', '141-broadway-heights/living.jpg', '141-broadway-heights/terrace.jpg'] },
   'gohar-gateway': { imgs: ['gohar-gateway/exterior.webp', 'gohar-gateway/aerial-courtyard.webp', 'gohar-gateway/hotel-tower.jpg', 'gohar-gateway/courtyard.jpg'] },
   'gohar-golf-vista': { imgs: ['gohar-golf-vista/exterior.webp', 'gohar-golf-vista/golf-course.webp', 'gohar-golf-vista/towers-aerial.webp', 'gohar-golf-vista/balconies.webp'] },
   'gohar-residencia-shopping-mall': { imgs: ['gohar-residencia-shopping-mall/render-010.webp', 'gohar-residencia-shopping-mall/street-view.jpg', 'gohar-residencia-shopping-mall/aerial.jpg', 'gohar-residencia-shopping-mall/render-005.webp'] },
-  'gohar-towers': { imgs: ['gohar-towers/towers-sky.jpg', 'gohar-towers/exterior.jpg', 'gohar-towers/towers-sky.jpg'] },
-  'gohar-complex-shopping-mall': { imgs: ['gohar-complex-shopping-mall/exterior.jpg', 'gohar-complex-shopping-mall/exterior.jpg', 'gohar-complex-shopping-mall/exterior.jpg'] },
+  // gohar-towers, gohar-complex-shopping-mall and gohar-rabi-center: too few distinct official images, so no motion piece
   'gohar-green-corner-shopping-center': { imgs: ['gohar-green-corner-shopping-center/exterior.jpg', 'gohar-green-corner-shopping-center/street-view.jpg', 'gohar-green-corner-shopping-center/brochure-exterior.jpg'] },
-  'gohar-rabi-center': { imgs: ['gohar-rabi-center/day-view.jpg', 'gohar-rabi-center/day-view.jpg', 'gohar-rabi-center/day-view.jpg'] },
   'gohar-villas': { imgs: ['gohar-villas/gate.jpg', 'gohar-villas/gate-approach.webp', 'gohar-villas/park.jpg', 'gohar-villas/commercial-area.webp'] },
   'kn-gohar-green-city': { imgs: ['kn-gohar-green-city/view-3.jpg', 'kn-gohar-green-city/photo-lawn.jpg', 'kn-gohar-green-city/photo-club-house.jpg', 'kn-gohar-green-city/photo-garden-walk.jpg'] },
 };
@@ -61,7 +58,7 @@ function make(name, f) {
   }
   const out = path.join(OUT, `${name}.mp4`);
   args.push('-filter_complex', parts.join(';'), '-map', `[${last}]`, '-an',
-    '-c:v', 'libx264', '-preset', 'medium', '-crf', W > 1280 ? '28' : '29', '-maxrate', W > 1280 ? '3.2M' : '2M', '-bufsize', '6M', '-pix_fmt', 'yuv420p', '-movflags', '+faststart', out);
+    '-c:v', 'libx264', '-preset', 'medium', '-crf', W > 1280 ? '29' : '29', '-maxrate', W > 1280 ? '2.4M' : '2M', '-bufsize', '6M', '-pix_fmt', 'yuv420p', '-movflags', '+faststart', out);
   const start = Date.now();
   const r = spawnSync(ffmpeg, args, { stdio: ['ignore', 'ignore', 'pipe'] });
   if (r.status !== 0) { console.log('FAILED', name, r.stderr.toString().slice(-1500)); return; }
