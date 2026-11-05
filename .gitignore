@@ -13,3 +13,7 @@ assets/video/stock/
 
 # local editor settings
 .claude/
+
+# Vercel build output (made during deployment)
+public/
+.vercel/

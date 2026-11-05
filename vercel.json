@@ -1,0 +1,9 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "installCommand": "npm install --omit=dev",
+  "buildCommand": "node tools/build.mjs && node tools/vercel-public.mjs",
+  "outputDirectory": "public",
+  "functions": {
+    "api/assistant.js": { "includeFiles": "assets/data/assistant.json" }
+  }
+}
