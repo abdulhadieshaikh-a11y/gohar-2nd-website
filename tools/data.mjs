@@ -33,7 +33,15 @@ export const heroMedia = {
   // NOT Gohar buildings. Hero clips (close-up dark glass, slow push-in): 9874596, 10191124, 37196426, 9701001,
   // 18484700; band 4308110; footer 10227696. Replace with Gohar's own drone
   // film before launch, or set video to '' to go back to the photographic preview.
-  video: 'assets/video/stock/hero.mp4', videoMobile: 'assets/video/stock/hero-mobile.mp4', videoPoster: 'assets/video/stock/hero.jpg', stock: true,
+  // REAL GOHAR FILM (Nov 2026): cut from the 7 official project videos (originals in _incoming-videos/).
+  // Desktop 61.6s 1920x1080, phone 41.9s 720x1280 portrait. Old stock hero kept in assets/video/stock/.
+  video: 'assets/video/film/hero.mp4', videoMobile: 'assets/video/film/hero-mobile.mp4', videoPoster: 'assets/video/film/hero.jpg', videoPosterMobile: 'assets/video/film/hero-mobile.jpg',
+  stock: false, // every video on the site is now Gohar's own footage
+  // "Now showing" caption: [start second, project slug, shot]
+  filmChapters: {
+    desktop: [[0, 'gohar-complex-shopping-mall', 'Aerial · Courtyard'], [4.2, 'gohar-golf-vista', 'Aerial · Twin towers'], [8.4, 'kn-gohar-green-city', 'Aerial · Main boulevard'], [12.6, 'gohar-villas', 'Aerial · Main gate'], [16.8, 'gohar-complex-shopping-mall', 'Aerial · Top-down'], [21, 'kn-gohar-green-city', 'Aerial · Community centre'], [25.2, 'kn-gohar-green-city', 'Aerial · Crescent'], [29.4, 'gohar-towers', 'Aerial · Lyari Expressway'], [31.4, 'gohar-golf-vista', 'Show apartment'], [35.6, 'gohar-villas', 'Master plan model'], [39.8, 'kn-gohar-green-city', 'Aerial · Parks'], [44, 'gohar-villas', 'Model villa interior'], [48.2, 'gohar-residencia-shopping-mall', 'Aerial · Construction progress'], [52.4, 'gohar-complex-shopping-mall', 'Aerial · Courtyard'], [56.6, 'kn-gohar-green-city', 'Aerial · Skyline']],
+    mobile: [[0, 'gohar-complex-shopping-mall', 'Aerial · Courtyard'], [4.2, 'gohar-towers', 'Aerial · Lyari Expressway'], [6.2, 'gohar-golf-vista', 'Aerial · Twin towers'], [10.4, 'kn-gohar-green-city', 'Aerial · Main boulevard'], [14.6, 'gohar-villas', 'Aerial · Main gate'], [18.8, 'gohar-complex-shopping-mall', 'Aerial · Top-down'], [23, 'gohar-towers', 'Tower view'], [24.3, 'gohar-golf-vista', 'Show apartment'], [28.5, 'gohar-villas', 'Model villa interior'], [32.7, 'kn-gohar-green-city', 'Aerial · Parks'], [36.9, 'gohar-complex-shopping-mall', 'Aerial · Courtyard']],
+  },
   motion: 'assets/video/hero.mp4', poster: 'assets/video/hero.jpg',
   // the motion piece is built from these frames, in order; the hero caption follows them
   size: [1600, 900], clip: 4.6, fade: 1,
@@ -147,7 +155,7 @@ export const projects = [
     keyStats: [['Floors', '13'], ['Bedrooms', '3 – 5'], ['Setting', 'Golf course']],
     hero: 'golf-course.webp', card: 'exterior.webp', look: 'cinema', tone: '#17221b',
     media: { video: '', videoPoster: '', motion: 'assets/video/gohar-golf-vista.mp4', poster: 'assets/video/gohar-golf-vista.jpg' },
-    gallery: ['exterior.webp', 'golf-course.webp', 'towers-aerial.webp', 'facade-detail.webp', 'balconies.webp'],
+    gallery: ['exterior.webp', 'golf-course.webp', 'towers-aerial.webp', 'facade-detail.webp', 'balconies.webp', 'film-01.jpg', 'film-02.jpg', 'film-03.jpg', 'film-04.jpg', 'film-05.jpg', 'film-06.jpg'],
     address: 'Near ACACIA Country & Golf Club, Gulshan-e-Roomi, Karachi',
     nearby: ['Adjacent to ACACIA Golf Club'],
     brochure: [DOCS + 'gohar-golf-vista-payment-plan.pdf', 'Payment plan (PDF, 47 MB)'],
@@ -167,7 +175,7 @@ export const projects = [
     layouts: [['Type A · 3 bed lounge', '1,200 sq ft gross (867 sq ft net) · Towers 1 & 2'], ['Type B · 2 bed lounge', '850 sq ft gross (543 sq ft net) · Towers 3 & 4'], ['Type C · 1 bed lounge', '550 sq ft gross (377 sq ft net) · Towers 3 & 4']],
     hero: 'render-010.webp', card: 'street-view.jpg', look: 'cinema', tone: '#1b2024',
     media: { video: '', videoPoster: '', motion: 'assets/video/gohar-residencia-shopping-mall.mp4', poster: 'assets/video/gohar-residencia-shopping-mall.jpg' },
-    gallery: ['render-010.webp', 'street-view.jpg', 'render-008.webp', 'aerial.jpg', 'render-005.webp', 'render-001.webp'],
+    gallery: ['render-010.webp', 'street-view.jpg', 'render-008.webp', 'aerial.jpg', 'render-005.webp', 'render-001.webp', 'film-01.jpg', 'film-02.jpg', 'film-03.jpg', 'film-04.jpg', 'film-05.jpg'],
     payment: {
       terms: 'Prices vary by floor band.',
       rows: [
@@ -195,7 +203,7 @@ export const projects = [
     hero: 'exterior.jpg', card: 'towers-sky.jpg', look: 'split', tone: '#1f1f1b',
     // no photographic motion: only two source images, one of them low-resolution
     media: { video: '', videoPoster: '', motion: '', poster: '' },
-    gallery: ['exterior.jpg', 'towers-sky.jpg'],
+    gallery: ['exterior.jpg', 'towers-sky.jpg', 'film-01.jpg', 'film-02.jpg', 'film-03.jpg', 'film-04.jpg'],
     payment: {
       terms: '50% on booking + 3 monthly instalments + balance before possession + documentation charges',
       rows: [
@@ -223,7 +231,7 @@ export const projects = [
     hero: 'exterior.jpg', card: 'exterior.jpg', look: 'split', tone: '#231c19',
     // only one official image exists, so no motion piece is made from it
     media: { video: '', videoPoster: '', motion: '', poster: '' },
-    gallery: ['exterior.jpg'],
+    gallery: ['exterior.jpg', 'film-01.jpg', 'film-02.jpg', 'film-03.jpg', 'film-04.jpg', 'film-05.jpg'],
     payment: {
       terms: 'Booking amount + 3 monthly instalments + balance before possession',
       rows: [
@@ -289,7 +297,7 @@ export const projects = [
     layouts: [['Phase 1', 'Residential plots of 120 and 160 sq yd'], ['Phase 2', 'Residential plots of 120 and 160 sq yd'], ['Phase 3', 'Residential plots of 120 sq yd; commercial plots of 100 and 200 sq yd']],
     hero: 'gate.jpg', card: 'gate-approach.webp', look: 'frame', tone: '#1d2219',
     media: { video: '', videoPoster: '', motion: 'assets/video/gohar-villas.mp4', poster: 'assets/video/gohar-villas.jpg' },
-    gallery: ['gate.jpg', 'gate-approach.webp', 'park.jpg', 'community-centre.jpg', 'masjid.jpg', 'hospital.jpg', 'commercial-area.webp', 'masterplan.jpg'],
+    gallery: ['gate.jpg', 'gate-approach.webp', 'park.jpg', 'community-centre.jpg', 'masjid.jpg', 'hospital.jpg', 'commercial-area.webp', 'masterplan.jpg', 'film-01.jpg', 'film-02.jpg', 'film-03.jpg', 'film-04.jpg', 'film-05.jpg', 'film-06.jpg', 'film-07.jpg'],
     plans: [['masterplan-phase-1.webp', 'Phase 1 masterplan'], ['masterplan-phase-2.webp', 'Phase 2 masterplan'], ['masterplan-phase-3.webp', 'Phase 3 masterplan']],
     payment: {
       terms: '10% each on booking, confirmation and allocation + 36 monthly + 6 half-yearly instalments + 10% before possession + documentation / development / utility charges',
@@ -321,9 +329,9 @@ export const projects = [
     keyStats: [['Community', 'Gated'], ['Floors', 'B + G + 4'], ['Amenities', '6+']],
     layouts: [['Platinum', '120 sq yd, one unit'], ['Gold', '120 sq yd, single storey'], ['Silver', '80 sq yd, single storey'], ['Apartments', 'Types A, B, C and D']],
     amenities: ['Club house', 'Swimming pool', 'Mini golf', "Children's play area", 'Basketball court', 'Security control room'],
-    hero: 'view-3.jpg', card: 'photo-club-house.jpg', look: 'frame', tone: '#16211a',
+    hero: 'view-3.jpg', card: 'film-03.jpg', look: 'frame', tone: '#16211a',
     media: { video: '', videoPoster: '', motion: 'assets/video/kn-gohar-green-city.mp4', poster: 'assets/video/kn-gohar-green-city.jpg' },
-    gallery: ['photo-club-house.jpg', 'photo-lawn.jpg', 'photo-garden-walk.jpg', 'photo-street.jpg', 'photo-facade.jpg', 'view-1.jpg', 'view-2.jpg', 'view-3.jpg'],
+    gallery: ['film-03.jpg', 'view-3.jpg', 'film-02.jpg', 'film-05.jpg', 'view-1.jpg', 'view-2.jpg', 'film-04.jpg', 'film-01.jpg', 'film-06.jpg', 'photo-lawn.jpg', 'photo-facade.jpg', 'photo-garden-walk.jpg', 'photo-street.jpg', 'photo-club-house.jpg'],
     plans: [['master-layout-plan.jpg', 'Master layout plan']],
     address: 'Korangi Road Link, off Shahrah-e-Faisal, near the Malir Court area, Karachi',
     nearby: ['Near Malir Court', 'Malir Cantt', 'Jamia Millia Road', 'Jinnah Terminal', 'Opposite Gohar Green Corner', 'Shahrah-e-Faisal'],

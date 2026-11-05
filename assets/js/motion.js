@@ -139,3 +139,74 @@
   if (root.classList.contains('pl-on')) { let s = false; const go = () => { if (!s) { s = true; begin(); } }; d.addEventListener('gohar:pl-done', go, { once: true }); setTimeout(go, 4600); }
   else if (d.readyState === 'loading') d.addEventListener('DOMContentLoaded', begin); else begin();
 })();
+
+// "Now showing": names the Gohar project on screen while the home film plays
+(() => {
+  const box = document.querySelector('[data-fnow]'); if (!box) return;
+  const hero = box.closest('[data-hero]'); const v = hero && hero.querySelector('video'); if (!v) return;
+  let data; try { data = JSON.parse(box.dataset.fnow); } catch { return; }
+  const name = box.querySelector('[data-fnow-name]'), meta = box.querySelector('[data-fnow-meta]');
+  const idx = box.querySelector('[data-fnow-i]'), tot = box.querySelector('[data-fnow-n]');
+  const bar = document.createElement('span'); bar.className = 'fnow__bar'; box.appendChild(bar);
+  const pad = (n) => String(n).padStart(2, '0');
+  let list = data.d, cur = -1, timer;
+  const pick = () => { list = /hero-mobile/.test(v.currentSrc || v.src || '') ? data.m : data.d; tot.textContent = pad(list.length); };
+  const show = (i, instant) => {
+    if (i === cur) return; cur = i; const c = list[i];
+    const apply = () => { name.textContent = c.name; meta.textContent = `${c.loc} · ${c.kind}`; idx.textContent = pad(i + 1); box.href = c.href; box.setAttribute('aria-label', `Now showing: ${c.name}, ${c.kind}`); box.classList.remove('is-swap'); };
+    clearTimeout(timer); if (instant) return apply();
+    box.classList.add('is-swap'); timer = setTimeout(apply, 380);
+  };
+  const tick = () => {
+    if (!list.length) return; const t = v.currentTime + 0.4; let i = 0;
+    for (let k = 0; k < list.length; k++) if (t >= list[k].t) i = k;
+    show(i);
+    const end = list[i + 1] ? list[i + 1].t : (v.duration || list[i].t + 5);
+    bar.style.transform = `scaleY(${Math.min(1, Math.max(0, (t - list[i].t) / (end - list[i].t))).toFixed(3)})`;
+  };
+  v.addEventListener('loadedmetadata', () => { pick(); cur = -1; show(0, true); });
+  v.addEventListener('timeupdate', tick);
+  if (v.currentSrc) pick();
+})();
+
+// Project cards: the short Gohar film plays on hover (desktop) or while the card is in view (phones), one at a time
+(() => {
+  const cards = [...document.querySelectorAll('.pxc[data-film]')]; if (!cards.length) return;
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const saveData = !!(navigator.connection && navigator.connection.saveData);
+  if (reduce || saveData) return;
+  const fine = matchMedia('(hover: hover) and (pointer: fine)').matches;
+  let active = null;
+  const start = (c) => {
+    const v = c.querySelector('.pxc__vid'); if (!v) return;
+    if (active && active !== c) stop(active);
+    active = c;
+    if (!v.getAttribute('src')) v.src = v.dataset.src;
+    const pr = v.play(); if (pr) pr.then(() => c.classList.add('is-playing')).catch(() => {});
+    v.addEventListener('playing', () => c.classList.add('is-playing'), { once: true });
+  };
+  const stop = (c) => { const v = c.querySelector('.pxc__vid'); c.classList.remove('is-playing'); if (v) v.pause(); if (active === c) active = null; };
+  if (fine) {
+    cards.forEach((c) => {
+      c.addEventListener('mouseenter', () => start(c));
+      c.addEventListener('mouseleave', () => stop(c));
+      c.addEventListener('focusin', () => start(c));
+      c.addEventListener('focusout', () => stop(c));
+    });
+  } else if ('IntersectionObserver' in window) {
+    const ratios = new Map();
+    const pick = () => { let best = null, br = 0.6; ratios.forEach((r, c) => { if (r >= br && !c.hidden) { best = c; br = r; } }); if (best && best !== active) start(best); if (!best && active) stop(active); };
+    // watch each card's picture; the most visible one (at least 60%) plays
+    const io = new IntersectionObserver((es) => { es.forEach((e) => ratios.set(e.target.closest('.pxc'), e.isIntersecting ? e.intersectionRatio : 0)); pick(); }, { threshold: [0, 0.3, 0.6, 0.8, 1] });
+    cards.forEach((c) => io.observe(c.querySelector('.pxc__media')));
+  }
+})();
+
+// Project gallery: "Show all N pictures"
+(() => {
+  document.querySelectorAll('[data-gal-more]').forEach((b) => b.addEventListener('click', () => {
+    const grid = b.closest('.pdg').querySelector('.pdg__grid'); grid.classList.add('is-all'); b.closest('.pdg__more').hidden = true;
+    if (window.ScrollTrigger) window.ScrollTrigger.refresh();
+    const first = grid.querySelector('.is-extra'); if (first) first.focus({ preventScroll: true });
+  }));
+})();

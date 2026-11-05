@@ -1,3 +1,15 @@
 node_modules/
 _originals/
 .env
+
+# raw source videos (1.4 GB) - the cut films live in assets/video/film
+_incoming-videos/
+
+# WordPress version (kept on this computer only)
+wordpress/
+
+# old demo stock clips, no longer used by the site
+assets/video/stock/
+
+# local editor settings
+.claude/

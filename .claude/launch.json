@@ -1,6 +1,0 @@
-{
-  "version": "0.0.1",
-  "configurations": [
-    { "name": "gohar", "runtimeExecutable": "node", "runtimeArgs": ["server/dev.mjs"], "port": 5173 }
-  ]
-}

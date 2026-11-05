@@ -67,7 +67,7 @@
     const r = p.m.getBoundingClientRect();
     const x = Math.min(Math.max(r.left + r.width / 2, 1), innerWidth - 2), y = Math.min(Math.max((Math.max(r.top, 0) + Math.min(r.bottom, innerHeight)) / 2, 1), innerHeight - 2);
     const el = d.elementFromPoint(x, y); const box = p.m.closest('.panel, section, article, a, figure, .ft__hero') || p.m;
-    return !!el && !box.contains(el) && !el.closest('.hd, .wa, .cursor, .float-img, .subnav, .filters');
+    return !!el && !box.contains(el) && !el.closest('.hd, .wa, .cursor, .float-img, .subnav, .filters, .ga-root, .ga-ui, .fnow, .totop');
   };
   const pick = () => {
     let best = null;
@@ -250,9 +250,10 @@
   }
 
   /* ---------- projects: filter + search ---------- */
-  const pf = $('.pf');
+  const pf = $('[data-pf]') || $('.pf');
   if (pf) {
-    const cards = $$('.pc', pf), tabs = $$('.ftab'), q = $('#search'), empty = $('.empty'), out = $('[data-count-out]'), locOut = $('[data-loc-out]'), clears = $$('[data-clear]');
+    const newGrid = pf.hasAttribute('data-pf');
+    const cards = $$(newGrid ? '[data-card]' : '.pc', pf), tabs = $$('.ftab'), q = $('#search'), empty = $('.empty'), out = $('[data-count-out]'), locOut = $('[data-loc-out]'), clears = $$('[data-clear]');
     const SH = ['feature', 'tall', 'wide', 'third', 'third', 'third', 'half', 'half', 'feature-r'];
     const all = ['pc--feature', 'pc--feature-r', 'pc--tall', 'pc--wide', 'pc--third', 'pc--half'];
     let cat = params.get('category') || 'all', loc = params.get('location') || '';
@@ -263,7 +264,7 @@
       cards.forEach((c) => { c.hidden = !vis.includes(c); });
       const n = vis.length;
       const seq = n === 1 ? ['feature'] : n === 2 ? ['half', 'half'] : n === 3 ? ['feature', 'half', 'half'] : n === 4 ? ['feature', 'third', 'third', 'third'] : SH;
-      vis.forEach((c, i) => { c.classList.remove(...all); c.classList.add('pc--' + seq[i % seq.length]); });
+      if (!newGrid) vis.forEach((c, i) => { c.classList.remove(...all); c.classList.add('pc--' + seq[i % seq.length]); });
       tabs.forEach((t) => { const on = t.dataset.cat === cat; t.classList.toggle('is-on', on); t.setAttribute('aria-pressed', String(on)); });
       if (out) out.textContent = n;
       if (locOut) locOut.textContent = loc ? ` in ${loc}` : '';

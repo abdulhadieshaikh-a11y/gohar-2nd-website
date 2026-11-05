@@ -401,5 +401,9 @@
   window.__goharAssistant = { reply: (t) => loadKB().then(() => reply(t)), open, forget: () => { ctx.project = null; } };
 
   // friendly greeting bubble once per visit
-  setTimeout(() => { if (!ss.get('ga-teased') && panel.hidden) { teaser.hidden = false; } }, 3500);
+  // on the home film it waits until the visitor scrolls past the hero, so the film and tagline stay clear
+  const tease = () => { if (!ss.get('ga-teased') && panel.hidden) teaser.hidden = false; };
+  const heroEl = d.querySelector('.hero--clean');
+  if (heroEl) { const onS = () => { if (scrollY > heroEl.offsetHeight * 0.6) { removeEventListener('scroll', onS); setTimeout(tease, 600); } }; addEventListener('scroll', onS, { passive: true }); }
+  else setTimeout(tease, 3500);
 })();

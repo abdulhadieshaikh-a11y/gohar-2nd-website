@@ -72,10 +72,10 @@ function pic(r, p, { alt, sizes = '100vw', cls = '', eager = false, role = 'imag
 
 /* Media component: a still/poster that is always there, plus (optionally) real footage or a photographic
    motion piece that the script loads only when needed. Real footage → "Film"; motion → "Photographic preview". */
-function media(r, { video = '', videoMobile = '', videoPoster = '', motion = '', poster = '', still, alt, cls = '', eager = false, mode = 'ambient', label = true, sizes = '100vw', role = 'media', chapters } = {}) {
+function media(r, { video = '', videoMobile = '', videoPoster = '', videoPosterMobile = '', motion = '', poster = '', still, alt, cls = '', eager = false, mode = 'ambient', label = true, sizes = '100vw', role = 'media', chapters } = {}) {
   const kind = video ? 'film' : motion ? 'motion' : 'still';
   const stillHtml = still ? pic(r, still, { alt, eager, sizes, role, cls: 'mb__still' })
-    : `<img class="mb__still" src="${r}${videoPoster || poster}" alt="${esc(alt || '')}"${eager ? ' fetchpriority="high"' : ' loading="lazy" decoding="async"'}>`;
+    : `${videoPosterMobile ? `<picture><source media="(max-width: 759px)" srcset="${r}${videoPosterMobile}">` : ''}<img class="mb__still" src="${r}${videoPoster || poster}" alt="${esc(alt || '')}"${eager ? ' fetchpriority="high"' : ' loading="lazy" decoding="async"'}>${videoPosterMobile ? '</picture>' : ''}`;
   let vid = '';
   if (kind === 'film' && mode === 'player') {
     vid = `<video class="mb__video" controls playsinline preload="none" poster="${r}${videoPoster || poster}" data-film><source src="${/^https?:/.test(video) ? video : r + video}" type="video/mp4">Your browser can’t play this film. <a href="${/^https?:/.test(video) ? video : r + video}">Download it</a>.</video>`;
@@ -169,7 +169,7 @@ ${body}
 
 <footer class="ft">
   <div class="ft__hero">
-    <div class="ft__media">${media(r, { video: 'assets/video/stock/footer.mp4', videoPoster: 'assets/video/stock/footer.jpg', alt: '', label: false, role: 'footer' })}</div>
+    <div class="ft__media">${media(r, { video: 'assets/video/projects/_footer.mp4', videoMobile: 'assets/video/projects/_footer-m.mp4', videoPoster: 'assets/video/projects/_footer.jpg', videoPosterMobile: 'assets/video/projects/_footer-m.jpg', alt: '', label: false, role: 'footer' })}</div>
     <div class="ft__shade"></div>
     <div class="wrap ft__cta">
       <p class="eyebrow eyebrow--light">Start a conversation</p>
@@ -203,10 +203,10 @@ ${body}
         </ul></div>
       </div>
     </div>
-    <div class="ft__word" aria-hidden="true">${'Gohar'.split('').map((ch) => `<span><b>${ch}</b></span>`).join('')}<em>Group of Companies</em></div>
+    <a class="ft__word ft__word--logo" href="${r}index.html" aria-label="Gohar Group of Companies, home"><img src="${img('brand/gohar-logo-light-trim.png')}" alt="Gohar Group of Companies" width="1748" height="556" loading="lazy"></a>
     <div class="ft__bot">
       <span>© <span data-year>2026</span> ${C.name}</span>
-      <span class="muted">Renders are artist’s impressions. Photographic previews are animated from official stills.${heroMedia.stock ? ' Background video footage is licensed stock for demonstration and does not show Gohar developments.' : ''}</span>
+      <span class="muted">Renders are artist’s impressions. Photographic previews are animated from official stills.${heroMedia.stock ? ' The home page film shows Gohar developments; other background footage is licensed stock for demonstration.' : ''}</span>
       <button class="to-top" type="button" data-top>Back to top ↑</button>
     </div>
   </div>
@@ -297,9 +297,13 @@ function home() {
   const reelRow = (list) => { const items = list.map(([p, f]) => `<a class="reel__item" href="projects/${p.slug}.html"><img src="${reelImg(p, f)}" alt="${esc(p.name)}" loading="lazy" decoding="async"><span>${p.name}<small>${p.area}</small></span></a>`).join(''); return items + items.replace(/<a class="reel__item"/g, '<a class="reel__item" tabindex="-1" aria-hidden="true"').replace(/alt="[^"]*"/g, 'alt=""'); };
   const row1 = projects.map((p) => [p, p.hero]);
   const row2 = projects.flatMap((p) => (p.gallery || []).filter((g) => g !== p.hero).slice(0, 1).map((g) => [p, g]));
+  const fc = heroMedia.filmChapters;
+  const chap = (l) => l.map(([t, s, k]) => { const p = bySlug(s); return { t, name: p.name, loc: p.area, kind: k, href: `projects/${s}.html` }; });
+  const filmNow = fc ? (() => { const d = chap(fc.desktop), m = chap(fc.mobile); return `
+  <a class="fnow" href="${d[0].href}" data-fnow="${esc(JSON.stringify({ d, m }))}"><span class="fnow__k"><i></i>Now showing <b data-fnow-i>01</b> / <span data-fnow-n>${pad(d.length)}</span></span><span class="fnow__n" data-fnow-name>${d[0].name}</span><span class="fnow__m" data-fnow-meta>${d[0].loc} · ${d[0].kind}</span></a>`; })() : '';
   const cleanHero = `
 <section class="hero hero--film hero--clean" data-hero aria-label="Gohar Group of Companies">
-  <div class="hero__media">${media(r, { video: heroMedia.video, videoMobile: heroMedia.videoMobile, videoPoster: heroMedia.videoPoster, alt: '', eager: true, label: false, role: 'hero' })}</div>
+  <div class="hero__media">${media(r, { video: heroMedia.video, videoMobile: heroMedia.videoMobile, videoPoster: heroMedia.videoPoster, videoPosterMobile: heroMedia.videoPosterMobile, alt: '', eager: true, label: false, role: 'hero' })}</div>${filmNow}
   <div class="hero__shade"></div>
   <div class="hero__center" data-intro>
     <p class="hero__kicker" data-fade><i></i>Gohar Group of Companies</p>
@@ -455,7 +459,7 @@ function home() {
 </section>
 
 ${filmHero ? `<section class="vband" aria-labelledby="vband-h">
-  <div class="vband__media">${media(r, { video: 'assets/video/stock/band.mp4', videoPoster: 'assets/video/stock/band.jpg', alt: '', label: false, role: 'band' })}</div>
+  <div class="vband__media">${media(r, { video: 'assets/video/projects/_band.mp4', videoMobile: 'assets/video/projects/_band-m.mp4', videoPoster: 'assets/video/projects/_band.jpg', videoPosterMobile: 'assets/video/projects/_band-m.jpg', alt: '', label: false, role: 'band' })}</div>
   <div class="vband__shade"></div>
   <div class="wrap vband__in">
     ${eyebrow('', 'The Gohar promise', 'eyebrow--light')}
@@ -468,7 +472,7 @@ ${filmHero ? `<section class="vband" aria-labelledby="vband-h">
 
 <section class="purp" aria-labelledby="purp-h">
   <div class="purp__media">
-    <div class="purp__img" data-purp-img>${pic(r, 'gohar-golf-vista/exterior.webp', { sizes: '(min-width: 900px) 50vw, 100vw', role: 'purpose', alt: 'Gohar Golf Vista, architectural render' })}</div>
+    <div class="purp__img" data-purp-img>${pic(r, 'gohar-residencia-shopping-mall/render-008.webp', { sizes: '100vw', role: 'purpose', alt: 'Gohar Residencia & Shopping Mall, architectural render of the full development' })}</div>
     <div class="purp__badge"><b>${projects.length}</b><span>Developments<br>Karachi &amp; Hyderabad</span></div>
     <p class="purp__cap">Gohar Golf Vista · Gulshan-e-Roomi · Architectural render</p>
   </div>
@@ -496,7 +500,7 @@ ${filmHero ? `<section class="vband" aria-labelledby="vband-h">
 
 ${filmHero ? '' : visitBand(r, { red: true, img: '141-broadway-heights/terrace.jpg' })}`;
   return layout({ file: 'index.html', title: 'Gohar Group of Companies | Real Estate Developer in Karachi & Hyderabad', desc: 'Residential towers, shopping centres, mixed-use landmarks and gated communities in Karachi and Hyderabad. Where relationships come first.', body,
-    preload: filmHero ? `<link rel="preload" as="image" href="${heroMedia.videoPoster}">\n` : `<link rel="preload" as="image" href="assets/img/${heroMedia.frames[0][0].replace(/([^/]+)\.\w+$/, '_w/$1-1600.webp')}" imagesrcset="assets/img/${heroMedia.frames[0][0].replace(/([^/]+)\.\w+$/, '_w/$1-800.webp')} 800w, assets/img/${heroMedia.frames[0][0].replace(/([^/]+)\.\w+$/, '_w/$1-1600.webp')} 1600w" imagesizes="100vw">\n` });
+    preload: filmHero ? (heroMedia.videoPosterMobile ? `<link rel="preload" as="image" href="${heroMedia.videoPoster}" media="(min-width: 760px)">\n<link rel="preload" as="image" href="${heroMedia.videoPosterMobile}" media="(max-width: 759px)">\n` : `<link rel="preload" as="image" href="${heroMedia.videoPoster}">\n`) : `<link rel="preload" as="image" href="assets/img/${heroMedia.frames[0][0].replace(/([^/]+)\.\w+$/, '_w/$1-1600.webp')}" imagesrcset="assets/img/${heroMedia.frames[0][0].replace(/([^/]+)\.\w+$/, '_w/$1-800.webp')} 800w, assets/img/${heroMedia.frames[0][0].replace(/([^/]+)\.\w+$/, '_w/$1-1600.webp')} 1600w" imagesizes="100vw">\n` });
 }
 
 const storyHref = (r, s) => `${r}stories/${s.slug}.html`;
@@ -515,24 +519,60 @@ function storiesBlock(r) {
 }
 
 /* ======================================================= PROJECTS */
-const SHAPES = ['feature', 'tall', 'wide', 'third', 'third', 'third', 'half', 'half', 'feature-r'];
+const PIN = `<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>`;
+const PLAYI = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z" fill="currentColor"/></svg>`;
+const CHECK = `<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m5 12.5 4.2 4.2L19 7"/></svg>`;
+const EXPAND = `<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7"/></svg>`;
+// short project film (cut from Gohar's own videos by tools/project-films.mjs), when there is one
+const TALL = new Set([]); // projects whose wide film is upright (Gohar Towers now uses a full-screen split screen)
+const filmOf = (p) => { const b = `assets/video/projects/${p.slug}`; return fs.existsSync(`${b}.mp4`) ? { tall: TALL.has(p.slug), video: `${b}.mp4`, card: `${b}-card.mp4`, mobile: `${b}-m.mp4`, poster: `${b}.jpg`, posterMobile: fs.existsSync(`${b}-m.jpg`) ? `${b}-m.jpg` : '' } : null; };
+const pill = (t, cls = '') => `<span class="pill ${cls}">${t}</span>`;
+const pillsOf = (p) => pill(catLabel(p)) + (p.status ? pill(p.status, 'pill--red') : '') + (p.featured ? pill('Signature', 'pill--gold') : '');
+const pdHead = (n, label, title, text = '', light = false) => `<div class="pd-head">
+      <div>${eyebrow(n, label, light ? 'eyebrow--light' : '')}<h2 class="pd-head__t split-lines">${lines(title)}</h2></div>
+      ${text ? `<p class="pd-head__p" data-fade>${text}</p>` : ''}
+    </div>`;
+
+const CAL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3v4M16 3v4M4 10h16"/></svg>';
+// "Related projects": same type first, then same city, then the rest
+function relatedSec(r, p, n = 3) {
+  const score = (x) => (x.category === p.category) * 2 + (x.city === p.city);
+  const nx = projects[(projects.indexOf(p) + 1) % projects.length];
+  const list = projects.filter((x) => x !== p && x !== nx).sort((a, b) => score(b) - score(a)).slice(0, n);
+  return `
+<section class="section rel" aria-labelledby="rel-h">
+  <div class="wrap">
+    <div class="rel__head">
+      <div><p class="eyebrow rel__k" data-fade><i></i>Continue exploring</p><h2 class="rel__t split-lines" id="rel-h">${lines(['Related <em>projects</em>'])}</h2></div>
+      <a class="rel__all link-u" href="${r}projects.html" data-fade>All projects ${NE}</a>
+    </div>
+    <div class="rel__grid" data-stagger>${list.map((x) => `<article class="rel__c">
+        <a class="rel__media" href="${r}projects/${x.slug}.html" tabindex="-1" aria-hidden="true">${pic(r, `${x.slug}/${x.card}`, { sizes: '(min-width: 900px) 30vw, 78vw', alt: '', role: 'related' })}<span class="rel__tags">${pill(catLabel(x))}${x.status ? pill(x.status, 'pill--red') : ''}</span><span class="rel__kind">${imgMeta(`${x.slug}/${x.card}`)[1]}</span></a>
+        <p class="rel__loc">${PIN}${locOf(x)}</p>
+        <h3 class="rel__n"><a href="${r}projects/${x.slug}.html">${x.name}</a></h3>
+        <p class="rel__sum">${x.summary}</p>
+        <div class="rel__acts"><a class="rel__view" href="${r}projects/${x.slug}.html" aria-label="View project: ${esc(x.name)}">View project <i></i></a><a class="rel__visit" href="${r}site-visit.html?project=${x.slug}" aria-label="Request a visit to ${esc(x.name)}">${CAL}Request a visit</a></div>
+      </article>`).join('')}</div>
+  </div>
+</section>`;
+}
 function projectCard(r, p, i) {
-  const shape = SHAPES[i % SHAPES.length];
-  const kind = imgMeta(`${p.slug}/${p.card}`)[1];
-  return `<article class="pc pc--${shape}${p.featured ? ' pc--sig' : ''}" data-shape="${shape}" data-cat="${p.category}" data-search="${esc((p.name + ' ' + p.area + ' ' + p.city + ' ' + catLabel(p)).toLowerCase())}">
-    <a class="pc__link" href="${r}projects/${p.slug}.html" data-cursor="View">
-      <div class="pc__media">
-        ${pic(r, `${p.slug}/${p.card}`, { sizes: shape.startsWith('feature') ? '(min-width: 900px) 62vw, 100vw' : '(min-width: 900px) 45vw, 100vw', role: 'card' })}
-        ${p.media.motion ? `<video class="pc__video" muted loop playsinline preload="none" aria-hidden="true" tabindex="-1" data-hover data-src="${r}${p.media.motion}"></video>` : ''}
-        <span class="mb__label" data-card-label data-still="${kind}"${p.media.motion ? ' data-motion="Photographic preview"' : ''}>${kind}</span>
-        <div class="pc__tags">${p.featured ? '<span class="tag tag--sig">Signature</span>' : ''}<span class="tag">${catLabel(p)}</span>${p.status ? `<span class="tag tag--red">${p.status}</span>` : ''}</div>
+  const f = filmOf(p);
+  return `<article class="pxc" data-card data-cat="${p.category}" data-search="${esc((p.name + ' ' + p.area + ' ' + p.city + ' ' + catLabel(p)).toLowerCase())}"${f ? ' data-film' : ''}>
+    <a class="pxc__link" href="${r}projects/${p.slug}.html">
+      <div class="pxc__media">
+        ${pic(r, `${p.slug}/${p.card}`, { sizes: '(min-width: 800px) 50vw, 100vw', role: 'card', alt: imgMeta(`${p.slug}/${p.card}`)[0] })}
+        ${f ? `<video class="pxc__vid" muted loop playsinline preload="none" aria-hidden="true" tabindex="-1" data-src="${r}${f.card}"></video>` : ''}
+        <span class="pxc__top">${pillsOf(p)}</span>
+        ${f ? `<span class="pxc__film">${PLAYI}<b>Film</b></span>` : ''}
+        <span class="pxc__view">View project ${ARR}</span>
       </div>
-      <div class="pc__info">
-        <span class="pc__n">${pad(i + 1)}</span>
-        <div><h2 class="pc__t">${p.name}</h2><p class="pc__l">${locOf(p)}</p></div>
-        <p class="pc__sum">${p.summary}</p>
-        <dl class="pc__facts">${p.keyStats.map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join('')}</dl>
-        <span class="pc__go">View project ${ARR}</span>
+      <div class="pxc__body">
+        <div class="pxc__head"><h2 class="pxc__t">${p.name}</h2><span class="pxc__n">${pad(i + 1)}</span></div>
+        <p class="pxc__loc">${PIN}${locOf(p)}</p>
+        <p class="pxc__sum">${p.summary}</p>
+        <dl class="pxc__facts">${p.keyStats.map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join('')}</dl>
+        <span class="pxc__go"><span>Explore project</span><i>${ARR}</i></span>
       </div>
     </a>
   </article>`;
@@ -540,19 +580,22 @@ function projectCard(r, p, i) {
 function projectsPage() {
   const r = '';
   curPage = 'projects.html';
-  const reel = ['gohar-towers/exterior.jpg', 'kn-gohar-green-city/view-3.jpg', 'kn-gohar-green-city/photo-street.jpg', 'kn-gohar-green-city/photo-lawn.jpg', 'kn-gohar-green-city/photo-facade.jpg', 'kn-gohar-green-city/view-2.jpg', 'kn-gohar-green-city/view-1.jpg'];
+  const filmed = projects.filter(filmOf).length;
+  const hf = filmOf({ slug: '_projects-hero' });
   const body = `
-<section class="lhead lhead--projects">
-  <div class="wrap" data-intro>
+<section class="pxh" data-hero aria-label="Gohar developments">
+  <div class="pxh__media">${hf ? media(r, { video: hf.video, videoMobile: hf.mobile, videoPoster: hf.poster, videoPosterMobile: hf.posterMobile, alt: '', eager: true, label: false, role: 'hero' }) : ''}</div>
+  <div class="pxh__shade"></div>
+  <div class="wrap pxh__in" data-intro>
     ${crumbs(r, [['', 'Projects']])}
-    <div class="lhead__grid">
-      <h1 class="d1 split-lines">${lines(['Every Gohar', '<em>development</em>'])}</h1>
-      <div class="lhead__aside" data-fade>
-        <p class="lead">Homes, shopping centres, offices and communities. Filter by type, search by name or area, and open any project.</p>
-        <dl class="mini-stats"><div><dt>Developments</dt><dd>${projects.length}</dd></div><div><dt>Karachi</dt><dd>${projects.filter((p) => p.city === 'Karachi').length}</dd></div><div><dt>Hyderabad</dt><dd>${projects.filter((p) => p.city === 'Hyderabad').length}</dd></div></dl>
-      </div>
+    <p class="pxh__k" data-fade><i></i>Our portfolio</p>
+    <h1 class="pxh__t split-lines">${lines(['Every Gohar', '<em>development.</em>'])}</h1>
+    <div class="pxh__row">
+      <p class="pxh__lead" data-fade>Homes, shopping centres, offices and gated communities across Karachi and Hyderabad. Projects marked <b>Film</b> play real Gohar footage.</p>
+      <dl class="pxh__stats" data-fade><div><dd>${projects.length}</dd><dt>Developments</dt></div><div><dd>${projects.filter((p) => p.city === 'Karachi').length}</dd><dt>Karachi</dt></div><div><dd>${projects.filter((p) => p.city === 'Hyderabad').length}</dd><dt>Hyderabad</dt></div><div><dd>${filmed}</dd><dt>On film</dt></div></dl>
     </div>
   </div>
+  <div class="hero__mini"><button class="ctrl ctrl--ghost" type="button" data-media-toggle aria-pressed="false" aria-label="Pause video">${PLAY}<span data-ctrl-text>Pause</span></button></div>
 </section>
 <div class="filters">
   <div class="wrap filters__in">
@@ -563,22 +606,15 @@ function projectsPage() {
     <label class="search">${SEARCH}<span class="sr">Search projects</span><input id="search" type="search" placeholder="Search by name or area" autocomplete="off"></label>
   </div>
 </div>
-<section class="section section--tight pf-sec">
+<section class="section pxs">
   <div class="wrap">
-    <p class="pf-count" aria-live="polite"><span data-count-out>${projects.length}</span> developments<span data-loc-out></span> <button class="link-u" type="button" data-clear hidden>Clear filters</button></p>
-    <div class="pf">${projects.map((p, i) => projectCard(r, p, i)).join('')}</div>
+    <p class="pf-count" aria-live="polite">Showing <span data-count-out>${projects.length}</span> developments<span data-loc-out></span> <button class="link-u" type="button" data-clear hidden>Clear filters</button></p>
+    <div class="pxg" data-pf>${projects.map((p, i) => projectCard(r, p, i)).join('')}</div>
     <div class="empty" hidden><h2 class="h3">No developments match.</h2><p>Try another name or area, or <button class="link-u" type="button" data-clear>show all ${projects.length} projects</button>.</p></div>
   </div>
 </section>
-<section class="section reel-sec">
-  <div class="wrap shead">
-    <div>${eyebrow('', 'Completed &amp; lived in', 'eyebrow--light')}<h2 class="h1 split-lines">${lines(['Photographs from', 'the <em>ground</em>'])}</h2></div>
-    <p data-fade>Most images on this site are architectural renders. These are photographs of completed Gohar developments: Gohar Towers in Gulshan-e-Iqbal and KN Gohar Green City near Malir. Drag to explore.</p>
-  </div>
-  <div class="reel" data-drag>${reel.map((f) => { const s = f.split('/')[0]; const p = bySlug(s); return `<a class="reel__item" href="projects/${s}.html" draggable="false"><div class="reel__media">${pic(r, f, { sizes: '(min-width: 900px) 34vw, 80vw', role: 'reel', attrs: 'draggable="false"' })}</div><span class="reel__cap"><b>${p.name}</b> ${p.area} · Photograph</span></a>`; }).join('')}</div>
-</section>
 ${visitBand(r, { img: 'gohar-golf-vista/balconies.webp' })}`;
-  return layout({ file: 'projects.html', title: 'Projects | Gohar Group of Companies', desc: 'All 10 Gohar developments across Karachi and Hyderabad: residential, commercial, mixed-use and gated communities.', body, theme: 'light' });
+  return layout({ file: 'projects.html', title: 'Projects | Gohar Group of Companies', desc: 'All 10 Gohar developments across Karachi and Hyderabad: residential, commercial, mixed-use and gated communities.', body, theme: 'dark' });
 }
 
 /* ======================================================= PROJECT DETAIL */
@@ -588,71 +624,41 @@ function projectPage(p, i) {
   const im = (f) => `${r}assets/img/${p.slug}/${f}`;
   const next = projects[(i + 1) % projects.length];
   const loc = locOf(p);
-  const used = new Set([p.hero]);
-  const pick = () => { const f = p.gallery.find((g) => !used.has(g)); if (f) used.add(f); return f; };
+  const f = filmOf(p);
   const msg = `Hi, I’m interested in ${p.name}. Please share availability, prices and payment plans.`;
-  const sections = [['overview', 'Overview'], p.media.video && ['film', 'Film'], p.layouts && ['layouts', 'Layouts'], p.plans && ['plans', 'Plans'], p.amenities && ['amenities', 'Amenities'], ['gallery', 'Gallery'], p.payment && ['payment', 'Payment plans'], ['location', 'Location'], ['enquire', 'Enquire']].filter(Boolean);
-  const fact4 = [['Category', catLabel(p)], ['Location', loc], ...(p.status ? [['Status', p.status]] : []), ...p.keyStats].slice(0, 4);
+  const sections = [['overview', 'Overview'], ['gallery', 'Gallery'], p.layouts && ['layouts', 'Types'], p.plans && ['plans', 'Plans'], p.amenities && ['amenities', 'Amenities'], p.payment && ['payment', 'Prices'], ['location', 'Location'], ['enquire', 'Enquire']].filter(Boolean);
+  const facts = [['Type', catLabel(p)], ['Location', loc], ...(p.status ? [['Status', p.status]] : []), ...p.keyStats].slice(0, 6);
   const titleLines = p.name.length > 22 ? p.name.split(' & ').map((s, k) => (k ? '&amp; ' : '') + s) : [p.name];
-  const tags = `<div class="tags" data-fade><span class="tag">${catLabel(p)}</span>${p.featured ? '<span class="tag tag--sig">Signature</span>' : ''}${p.status ? `<span class="tag tag--red">${p.status}</span>` : ''}</div>`;
-  const ctas = (light) => `<div class="btns" data-fade><a class="btn btn--red" href="${r}site-visit.html?project=${p.slug}">Schedule a Site Visit ${ARR}</a><a class="btn ${light ? 'btn--line' : 'btn--line-light'}" href="#enquire">Enquire</a></div>`;
-  const factbar = (cls = '') => `<dl class="factbar ${cls}" data-fade>${fact4.map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join('')}</dl>`;
-  const heroMediaHtml = (o = {}) => projMedia(r, p, { eager: true, alt: imgMeta(`${p.slug}/${p.hero}`)[0], role: 'hero', ...o });
+  const heroMediaHtml = f
+    ? media(r, { video: f.video, videoMobile: f.mobile, videoPoster: f.poster, videoPosterMobile: f.posterMobile, alt: '', eager: true, label: false, role: 'hero' })
+    : projMedia(r, p, { eager: true, alt: imgMeta(`${p.slug}/${p.hero}`)[0], role: 'hero', label: false, cls: 'mb--cover' });
 
-  let hero, theme = 'dark';
-  if (p.look === 'cinema') {
-    hero = `<section class="phero phero--cinema" data-hero>
-  <div class="phero__media">${heroMediaHtml({ cls: 'mb--cover' })}</div>
-  <div class="hero__shade"></div>
-  <div class="wrap phero__in" data-intro>
+  const hero = `
+<section class="pdh${f ? ' pdh--film' : ''}${f && f.tall ? ' pdh--tall' : ''}" data-hero>
+  ${f && f.tall ? `<div class="pdh__bg" aria-hidden="true"><img src="${r}${f.poster}" alt=""></div>` : ''}
+  <div class="pdh__media">${heroMediaHtml}</div>
+  <div class="pdh__shade"></div>
+  <div class="wrap pdh__in" data-intro>
     ${crumbs(r, [['projects.html', 'Projects'], ['', p.name]])}
-    ${tags}
-    <h1 class="phero__title split-lines">${lines(titleLines)}</h1>
-    <div class="phero__row"><p class="lead" data-fade>${p.lead}</p>${ctas(false)}</div>
-    ${factbar()}
-  </div>
-</section>`;
-  } else if (p.look === 'split') {
-    theme = 'light';
-    hero = `<section class="phero phero--split" data-hero>
-  <div class="wrap phero__grid" data-intro>
-    <div class="phero__text">
-      ${crumbs(r, [['projects.html', 'Projects'], ['', p.name]])}
-      ${tags}
-      <h1 class="phero__title split-lines">${lines(titleLines)}</h1>
-      <p class="lead" data-fade>${p.lead}</p>
-      ${ctas(true)}
-      ${factbar('factbar--light')}
+    <div class="pdh__tags" data-fade>${pillsOf(p)}</div>
+    <h1 class="pdh__t split-lines">${lines(titleLines)}</h1>
+    <div class="pdh__row">
+      <div class="pdh__txt" data-fade><p class="pdh__loc">${PIN}${loc}</p><p class="pdh__lead">${p.lead}</p></div>
+      <div class="btns pdh__btns" data-fade><a class="btn btn--red" href="${r}site-visit.html?project=${p.slug}">Schedule a Site Visit ${ARR}</a><a class="btn btn--line-light" href="#enquire">Enquire</a></div>
     </div>
-    <div class="phero__frame reveal-img">${heroMediaHtml({ sizes: '(min-width: 900px) 50vw, 100vw' })}</div>
   </div>
-</section>`;
-  } else {
-    hero = `<section class="phero phero--frame" data-hero>
-  <div class="wrap phero__in" data-intro>
-    ${crumbs(r, [['projects.html', 'Projects'], ['', p.name]])}
-    ${tags}
-    <div class="phero__row phero__row--top"><h1 class="phero__title split-lines">${lines(titleLines)}</h1><div><p class="lead" data-fade>${p.lead}</p>${ctas(false)}</div></div>
+  <div class="pdh__bar wrap">
+    <button class="ctrl ctrl--ghost" type="button" data-media-toggle aria-pressed="false" aria-label="Pause video">${PLAY}<span data-ctrl-text>Pause</span></button>
+    ${f ? `<span class="pdh__note"><i></i>Gohar film · real footage</span>` : ''}
   </div>
-  <div class="phero__expand" data-expand><div class="phero__expand-in">${heroMediaHtml({ cls: 'mb--cover' })}</div></div>
-  <div class="wrap">${factbar()}</div>
-</section>`;
-  }
+</section>
+<div class="pdf"><div class="wrap"><dl class="pdf__in" data-fade>${facts.map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join('')}</dl></div></div>`;
 
-  const breakImg = p.gallery.length >= 3 ? pick() : null;
-  const locImg = pick();
-
-  const filmSec = p.media.video ? `
-<section class="section film-sec" id="film">
-  <div class="wrap">
-    <div class="shead"><div>${eyebrow('', 'Film', 'eyebrow--light')}<h2 class="h2">${p.name} <em>on film</em></h2></div></div>
-    <div class="film-frame">${media(r, { ...p.media, mode: 'player', alt: '' })}</div>
-  </div>
-</section>` : '';
-
-  const galleryHtml = p.gallery.length >= 3
-    ? `<div class="gal" data-drag>${p.gallery.map((f, k) => { const [w, h] = dims(`assets/img/${p.slug}/${f}`); const [alt, kind] = imgMeta(`${p.slug}/${f}`); return `<button class="gal__item${h > w ? ' gal__item--tall' : ''}" type="button" data-full="${im(f)}" data-set="gallery" data-alt="${esc(alt)}" data-kind="${kind}" data-cursor="Open" draggable="false"><span class="gal__media">${pic(r, `${p.slug}/${f}`, { sizes: '(min-width: 900px) 46vw, 85vw', role: 'gallery', attrs: 'draggable="false"' })}</span><span class="gal__cap"><b>${pad(k + 1)}</b>${kind}</span></button>`; }).join('')}</div>`
-    : `<div class="wrap gal-solo">${p.gallery.map((f, k) => { const [alt, kind] = imgMeta(`${p.slug}/${f}`); return `<button class="gal-solo__item reveal-img" type="button" data-full="${im(f)}" data-set="gallery" data-alt="${esc(alt)}" data-kind="${kind}" data-cursor="Open">${pic(r, `${p.slug}/${f}`, { sizes: '(min-width: 900px) 70vw, 100vw', role: 'gallery' })}<span class="mb__label">${kind}</span></button>`; }).join('')}</div>`;
+  // gallery: a mosaic; long galleries show 9 first, the rest behind "Show all"
+  const g = p.gallery, n = g.length, MAX = 9;
+  const kinds = [...new Set(g.map((x) => imgMeta(`${p.slug}/${x}`)[1]))];
+  const galItems = g.map((x, k) => { const [alt, kind] = imgMeta(`${p.slug}/${x}`); return `<button class="pdg__item${k >= MAX ? ' is-extra' : ''}" type="button" data-full="${im(x)}" data-set="gallery" data-alt="${esc(alt)}" data-kind="${kind}" data-cursor="Open" aria-label="Open picture ${k + 1} of ${n}: ${esc(alt)}"><span class="pdg__img">${pic(r, `${p.slug}/${x}`, { sizes: k === 0 ? '(min-width: 900px) 50vw, 100vw' : '(min-width: 900px) 25vw, 50vw', role: 'gallery', alt })}</span><span class="pdg__cap"><b>${pad(k + 1)}</b>${kind}</span><span class="pdg__open">${EXPAND}</span></button>`; }).join('');
+  const locImg = n < 2 ? null : g.find((x) => x !== p.hero && x !== p.card && /aerial|view|film-0[2-3]|gate|street|exterior/.test(x)) || g.find((x) => x !== p.hero) || p.hero;
 
   const body = `
 ${hero}
@@ -663,76 +669,80 @@ ${hero}
   <a class="btn btn--sm btn--red" href="${r}site-visit.html?project=${p.slug}">Visit</a>
 </div></nav>
 
-<section class="section" id="overview">
-  <div class="wrap">
-    ${eyebrow('01', 'Project story')}
-    <h2 class="d2 split-lines ov__h">${lines([p.headline])}</h2>
-    <div class="ov">
-      <div class="prose" data-fade>${p.story.map((s, k) => `<p${k === 0 ? ' class="prose__first"' : ''}>${s}</p>`).join('')}</div>
-      <div class="ov__side" data-fade="0.12">
-        <dl class="kstats">${p.keyStats.map(([k, v]) => `<div><dd>${v}</dd><dt>${k}</dt></div>`).join('')}</dl>
-        <h3 class="h4">Specifications</h3>
-        <dl class="specs">${p.facts.map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join('')}</dl>
-        <div class="btns"><a class="btn btn--dark" href="#enquire">Request current pricing ${ARR}</a>${p.brochure ? `<a class="btn btn--line" href="${p.brochure[0]}" target="_blank" rel="noopener">${p.brochure[1]} ${NE}</a>` : ''}</div>
-      </div>
+<section class="section pdo" id="overview">
+  <div class="wrap pdo__grid">
+    <div class="pdo__main">
+      ${eyebrow('01', 'Overview')}
+      <h2 class="pdo__h split-lines">${lines([p.headline])}</h2>
+      <div class="pdo__prose" data-fade>${p.story.map((s, k) => `<p${k === 0 ? ' class="pdo__first"' : ''}>${s}</p>`).join('')}</div>
+      <dl class="pdo__stats" data-fade>${p.keyStats.map(([k, v]) => `<div><dd>${v}</dd><dt>${k}</dt></div>`).join('')}</dl>
     </div>
+    <aside class="pdo__card" data-fade="0.1">
+      <p class="pdo__ck">At a glance</p>
+      <dl class="pdo__specs">${p.facts.map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join('')}</dl>
+      <div class="pdo__btns">
+        <a class="btn btn--red" href="#enquire">Request current pricing ${ARR}</a>
+        <a class="btn btn--line" href="${waLink(msg)}" target="_blank" rel="noopener">WhatsApp our team</a>
+        ${p.brochure ? `<a class="btn btn--line" href="${p.brochure[0]}" target="_blank" rel="noopener">${p.brochure[1]} ${NE}</a>` : ''}
+      </div>
+    </aside>
   </div>
 </section>
 
-${breakImg ? `<figure class="break" data-parallax-wrap>${pic(r, `${p.slug}/${breakImg}`, { sizes: '100vw', role: 'break', attrs: 'data-parallax' })}<figcaption class="wrap">${esc(imgMeta(`${p.slug}/${breakImg}`)[0])} · ${imgMeta(`${p.slug}/${breakImg}`)[1]}</figcaption></figure>` : ''}
-${filmSec}
+<section class="section pdg" id="gallery">
+  <div class="wrap">
+    ${pdHead('02', 'Gallery', [`Pictures of <em>${p.name}</em>`], `${n} picture${n > 1 ? 's' : ''}: ${kinds.join(', ').toLowerCase()}. Select any picture to view it full screen.${kinds.includes('Architectural render') ? ' Renders are artist’s impressions.' : ''}`)}
+    <div class="pdg__grid pdg__grid--${Math.min(n, 5)}">${galItems}</div>
+    ${n > MAX ? `<div class="pdg__more"><button class="btn btn--line" type="button" data-gal-more>Show all ${n} pictures</button></div>` : ''}
+  </div>
+</section>
 
 ${p.layouts ? `
-<section class="section" id="layouts">
+<section class="section section--paper pdl" id="layouts">
   <div class="wrap">
-    <div class="shead"><div>${eyebrow('02', 'Layouts')}<h2 class="h1 split-lines">${lines(['Homes &amp; <em>types</em>'])}</h2></div><p data-fade>Contact our team for detailed layouts and current availability.</p></div>
-    <ol class="layouts" data-stagger>${p.layouts.map(([t, d], k) => `<li><b>${pad(k + 1)}</b><h3>${t}</h3><p>${d}</p></li>`).join('')}</ol>
+    ${pdHead('03', 'Types', ['Choose your <em>space</em>'], 'Contact our team for detailed layouts, sizes and current availability.')}
+    <ol class="pdl__grid" data-stagger>${p.layouts.map(([t, d], k) => `<li class="pdl__c"><span class="pdl__n">${pad(k + 1)}</span><h3 class="pdl__t">${t}</h3><p>${d}</p><a class="pdl__a" href="#enquire">Ask about this ${ARR}</a></li>`).join('')}</ol>
   </div>
 </section>` : ''}
 
 ${p.plans ? `
-<section class="section section--paper" id="plans">
+<section class="section pdp" id="plans">
   <div class="wrap">
-    <div class="shead"><div>${eyebrow('', 'Plans')}<h2 class="h1 split-lines">${lines(['Floor plans &amp; <em>masterplans</em>'])}</h2></div><p data-fade>From the official project material. Select a plan to view it full screen. Layouts may change; ask our team for the latest plans.</p></div>
-    <div class="plans" data-stagger>${p.plans.map(([f, l]) => `<button type="button" data-full="${im(f)}" data-set="plans" data-alt="${esc(imgMeta(`${p.slug}/${f}`)[0] || l)}" data-kind="${imgMeta(`${p.slug}/${f}`)[1]}" data-cursor="Open"><span class="plans__media">${pic(r, `${p.slug}/${f}`, { sizes: '(min-width: 900px) 30vw, 90vw', role: 'plan', alt: imgMeta(`${p.slug}/${f}`)[0] || l })}</span><span class="plans__l">${l}</span></button>`).join('')}</div>
+    ${pdHead('', 'Plans', ['Floor plans &amp; <em>masterplans</em>'], 'From the official project material. Select a plan to view it full screen. Layouts may change; ask our team for the latest plans.')}
+    <div class="pdp__grid" data-stagger>${p.plans.map(([x, l]) => `<button class="pdp__c" type="button" data-full="${im(x)}" data-set="plans" data-alt="${esc(imgMeta(`${p.slug}/${x}`)[0] || l)}" data-kind="${imgMeta(`${p.slug}/${x}`)[1]}" data-cursor="Open"><span class="pdp__img">${pic(r, `${p.slug}/${x}`, { sizes: '(min-width: 900px) 30vw, 90vw', role: 'plan', alt: imgMeta(`${p.slug}/${x}`)[0] || l })}</span><span class="pdp__l"><span>${l}</span>${EXPAND}</span></button>`).join('')}</div>
   </div>
 </section>` : ''}
 
 ${p.amenities ? `
-<section class="section section--tone" id="amenities">
+<section class="section section--tone pda" id="amenities">
   <div class="wrap">
-    <div class="shead"><div>${eyebrow('', 'Amenities', 'eyebrow--light')}<h2 class="h1 split-lines">${lines(['Shared spaces', '&amp; <em>facilities</em>'])}</h2></div></div>
-    <ul class="amen" data-stagger>${p.amenities.map((a, k) => `<li><b>${pad(k + 1)}</b>${a}</li>`).join('')}</ul>
+    ${pdHead('', 'Amenities', ['Shared spaces &amp; <em>facilities</em>'], '', true)}
+    <ul class="pda__grid" data-stagger>${p.amenities.map((a) => `<li>${CHECK}<span>${a}</span></li>`).join('')}</ul>
   </div>
 </section>` : ''}
 
-<section class="section gal-sec" id="gallery">
-  <div class="wrap shead"><div>${eyebrow('', 'Gallery')}<h2 class="h1 split-lines">${lines([`Inside <em>${p.name}</em>`])}</h2></div><p data-fade>${p.gallery.length} official image${p.gallery.length > 1 ? 's' : ''}${p.gallery.length >= 3 ? '. Drag to explore, select to open' : ''}. Renders are artist’s impressions and may differ from the completed building.</p></div>
-  ${galleryHtml}
-</section>
-
 ${p.payment ? `
-<section class="section section--paper" id="payment">
+<section class="section section--paper pdpay" id="payment">
   <div class="wrap">
-    <div class="shead"><div>${eyebrow('', 'Payment plans')}<h2 class="h1 split-lines">${lines(['Published prices', '&amp; <em>instalments</em>'])}</h2></div><p data-fade>${p.payment.terms}</p></div>
-    <div class="table-wrap" data-fade><table class="ptable"><thead><tr><th scope="col">Type</th><th scope="col">Size</th><th scope="col">Total</th><th scope="col">Schedule</th></tr></thead><tbody>
+    ${pdHead('', 'Prices &amp; payment plans', ['Published prices', '&amp; <em>instalments</em>'], p.payment.terms)}
+    <div class="table-wrap pdpay__table" data-fade><table class="ptable"><thead><tr><th scope="col">Type</th><th scope="col">Size</th><th scope="col">Total</th><th scope="col">Schedule</th></tr></thead><tbody>
       ${p.payment.rows.map(([t, s, pr, sc]) => `<tr><th scope="row" data-l="Type">${t}</th><td data-l="Size">${s}</td><td class="price" data-l="Total">${pr}</td><td class="sched" data-l="Schedule">${sc}</td></tr>`).join('')}
     </tbody></table></div>
     <p class="note">As published on the official Gohar website (read on 22 October 2026). Prices and terms can change: please confirm current figures and availability with our sales team before booking.</p>
-    <div class="btns"><a class="btn btn--dark" href="#enquire">Confirm current pricing ${ARR}</a><a class="btn btn--line" href="${waLink(msg)}" target="_blank" rel="noopener">Ask on WhatsApp</a></div>
+    <div class="btns"><a class="btn btn--dark" href="#enquire">Confirm current pricing ${ARR}</a><a class="btn btn--line" href="../calculator.html?project=${p.slug}">Plan my instalments</a><a class="btn btn--line" href="${waLink(msg)}" target="_blank" rel="noopener">Ask on WhatsApp</a></div>
   </div>
 </section>` : ''}
 
-<section class="section" id="location">
-  <div class="wrap loc${locImg ? '' : ' loc--solo'}">
-    <div>
+<section class="section pdloc" id="location">
+  <div class="wrap pdloc__grid${locImg ? '' : ' pdloc__grid--solo'}">
+    <div class="pdloc__card" data-fade>
       ${eyebrow('', 'Location')}
-      <h2 class="h1 split-lines">${lines([loc])}</h2>
-      <p class="lead" data-fade>${p.address}</p>
-      <ul class="chips chips--static" data-stagger>${p.nearby.map((n) => `<li class="chip">${n}</li>`).join('')}</ul>
-      <div class="btns" data-fade><a class="btn btn--dark" href="${mapsQ(p.address)}" target="_blank" rel="noopener">Get directions ${NE}</a></div>
+      <h2 class="pdloc__t">${loc}</h2>
+      <p class="pdloc__addr">${PIN}<span>${p.address}</span></p>
+      ${p.nearby && p.nearby.length ? `<p class="pdloc__k">Nearby</p><ul class="pdloc__near">${p.nearby.map((x) => `<li>${CHECK}<span>${x}</span></li>`).join('')}</ul>` : ''}
+      <div class="btns"><a class="btn btn--dark" href="${mapsQ(p.address)}" target="_blank" rel="noopener">Get directions ${NE}</a><a class="btn btn--line" href="${r}site-visit.html?project=${p.slug}">Book a visit</a></div>
     </div>
-    ${locImg ? `<figure class="loc__fig reveal-img">${pic(r, `${p.slug}/${locImg}`, { sizes: '(min-width: 900px) 45vw, 100vw', role: 'location' })}<figcaption>${imgMeta(`${p.slug}/${locImg}`)[1]}</figcaption></figure>` : ''}
+    ${locImg ? `<figure class="pdloc__fig reveal-img">${pic(r, `${p.slug}/${locImg}`, { sizes: '(min-width: 900px) 55vw, 100vw', role: 'location' })}<figcaption>${imgMeta(`${p.slug}/${locImg}`)[1]}</figcaption></figure>` : ''}
   </div>
 </section>
 
@@ -759,6 +769,8 @@ ${p.payment ? `
   </div>
 </section>
 
+${relatedSec(r, p)}
+
 <section class="plan-strip">
   <div class="wrap plan-strip__in">
     <div class="plan-strip__icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="3" width="16" height="18" rx="2.5"/><path d="M8 7h8M8 11h2M12 11h2M16 11h0M8 15h2M12 15h2M8 18h2M12 18h2M16 15v3"/></svg></div>
@@ -772,7 +784,7 @@ ${p.payment ? `
   <span class="wrap next__in"><span class="eyebrow eyebrow--light">Next project</span><span class="next__t">${next.name}</span><span class="next__l">${locOf(next)} ${ARR}</span></span>
 </a>
 ${lightbox()}`;
-  return layout({ r, file: `projects/${p.slug}.html`, title: `${p.name} | ${loc} | Gohar Group of Companies`, desc: p.summary, body, theme, tone: p.tone, image: `${p.slug}/${p.hero}` });
+  return layout({ r, file: `projects/${p.slug}.html`, title: `${p.name} | ${loc} | Gohar Group of Companies`, desc: p.summary, body, theme: 'dark', tone: p.tone, image: `${p.slug}/${p.hero}` });
 }
 const lightbox = () => `<div class="lb" role="dialog" aria-modal="true" aria-label="Image viewer" hidden><figure class="lb__fig"><img alt=""><figcaption class="lb__cap"></figcaption></figure><button class="lb__btn lb__close" type="button" aria-label="Close">✕</button><button class="lb__btn lb__prev" type="button" aria-label="Previous image">←</button><button class="lb__btn lb__next" type="button" aria-label="Next image">→</button><div class="lb__count"></div></div>`;
 
@@ -808,7 +820,7 @@ function about() {
   ];
   const body = `
 <section class="ab-hero" data-hero>
-  <div class="ab-hero__media">${media(r, { ...aboutMedia, still: aboutMedia.frames[0][0], alt: '', eager: true, cls: 'mb--cover', role: 'hero', label: false })}</div>
+  <div class="ab-hero__media">${(() => { const af = filmOf({ slug: '_about-hero' }); return af ? media(r, { video: af.video, videoMobile: af.mobile, videoPoster: af.poster, videoPosterMobile: af.posterMobile, alt: '', eager: true, label: false, role: 'hero' }) : media(r, { ...aboutMedia, still: aboutMedia.frames[0][0], alt: '', eager: true, cls: 'mb--cover', role: 'hero', label: false }); })()}</div>
   <div class="ab-hero__shade"></div>
   <div class="wrap ab-hero__in" data-intro>
     ${crumbs(r, [['', 'About']])}
